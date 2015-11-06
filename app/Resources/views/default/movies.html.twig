@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Movies</title>
+    </head>
+    <body>
+        <h1>My Movies</h1>
+
+        <!-- Add the movies that were passed from the controller -->
+        <table id="app-movies-table">
+            <thead>
+                <tr>
+                    <th>Movie Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for movie in movies %}
+                <tr>
+                    <td>{{movie.movie_name}}</td>
+                    <td>
+                        <div movie-id="{{movie.movie_id}}">
+                            <a href="#" class="app-remove-movie">Remove</a>
+                            <span class="separator"> | </span>
+                            <a href="#">Update</a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <br />
+        <div id="app-actions">
+            <a href="#" class="add-movie">Add new Movie</a>
+        </div>
+    </body>
+</html>
+
+{% javascripts '@AppBundle/Resources/public/js/*' %}
+    <script src="{{ asset_url }}"></script>
+{% endjavascripts %}
+
+<script>
+
+    // Add listener for the remove link
+    $('.app-remove-movie').on('click', function(e) {
+        var targetMovie = $(this).parent().attr('movie-id');
+        console.log(targetMovie);
+    });
+
+    // Add listener for the
+    $('.app-remove-movie').on('click', function(e) {
+
+        // Build the html for 
+        //$('td:last').append(html);
+        $(this).closest('tr').remove();
+    });
+</script>
