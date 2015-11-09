@@ -1,60 +1,243 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap/dist/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('assets/css/mystyles.css') }}">
         <title>My Movies</title>
     </head>
     <body>
-        <h1>My Movies</h1>
+        <header class="jumbotron">
+            <div class="container">
+                <div class="row row-header">
+                    <div class="col-xs-12 col-sm-8">
+                        <span class="title-text"><strong>MY MOVIES</strong></span>
+                        <p style="padding:40px;"></p>
+                        <p class="description">This is a simple app that allows listing, adding, removing and updating Movies.</p>
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        <p style="padding:20px;"></p>
+                        <img src="{{ asset('assets/img/img_film.png') }}" class="img-responsive film-img">
+                    </div>
+                </div>
+            </div>
+        </header>
 
         <!-- Add the movies that were passed from the controller -->
-        <table id="app-movies-table">
-            <thead>
-                <tr>
-                    <th>Movie Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+        <div class="container">
+            <div class="row row-content">
+                <div class="col-xs-12 col-sm-9">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="app-movies-table">
+                            <thead>
+                                <tr>
+                                    <th>Movie Name</th>
+                                    <th>Release Year</th>
+                                    <th>Rating</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
 
-            <tbody>
-            {% for movie in movies %}
-                <tr>
-                    <td>{{movie.movie_name}}</td>
-                    <td>
-                        <div movie-id="{{movie.movie_id}}">
-                            <a href="#" class="app-remove-movie">Remove</a>
-                            <span class="separator"> | </span>
-                            <a href="#">Update</a>
+                            <tbody>
+                                {% for movie in movies %}
+                                    <tr>
+                                        <td>{{movie.getMovieName()}}</td>
+                                        <td>
+                                            {% if movie.getReleaseYear() %}
+                                               {{movie.getReleaseYear()}}
+                                            {% else %}
+                                                --
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if movie.getRating() %}
+                                                {{movie.getRating()}}
+                                            {% else %}
+                                                --
+                                           {% endif %}
+                                        </td>
+
+                                    <td>
+                                        <div movie-id="{{movie.getMovieId()}}">
+                                            <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><a href="#" class="app-remove-movie"> Remove</a>
+                                            <span class="separator"> | </span>
+                                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span><a href="#"> Update</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="row row-content">
+                <div class="col-xs-12 col-sm-9">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#moviesModal" id="btn-add-new">
+                    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Add new Movie
+                </button>
+                </div>
+            </div>
+
+            <br />
+
+            <footer class="row-footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-8 col-xs-offset-1 col-sm-8 col-sm-offset-1">
+                            <strong>Author: Andrea Carolina Alarcon</strong>
                         </div>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-
-        <br />
-        <div id="app-actions">
-            <a href="#" class="add-movie">Add new Movie</a>
+                    </div>
+                </div>
+            </footer>
         </div>
+
+        <div class="modal fade" id="moviesModal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Insert/update Movies</h4>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <form class="form-horizontal" id="form-movies" method="post">
+                            <div class="form-group">
+                                <label for="movie-name" class="col-sm-4 control-label">Movie Name:</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="movie-name" name="movie_name" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="release-year" class="col-sm-4 control-label">Release year:</label>
+                                <div class="col-sm-8">
+                                    <input type="text" maxlength="4" class="form-control" id="release-year" name="release_year"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="rating" class="col-sm-4 control-label">Rating:</label>
+                                <div class="col-sm-8">
+                                    <input type="number" class="form-control" min="1" max="5" step="1" id="rating" name="rating"></textarea>
+                                </div>
+                            </div>
+                            <input class="hide" type="text" name="movie_id">
+                        </form>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" id="app-cancel-movie">Close</button>
+                        <button type="button" class="btn btn-primary" id="app-save-movie">Save changes</button>
+                    </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
     </body>
 </html>
 
 {% javascripts '@AppBundle/Resources/public/js/*' %}
     <script src="{{ asset_url }}"></script>
+    <script src="{{ asset('assets/vendor/bootstrap/js/modal.js') }}"></script>
+    <script src="{{ asset('assets/vendor/jquery.validate.min.js') }}"></script>
 {% endjavascripts %}
 
 <script>
 
+    // Start validation for the Movies form (in modal)
+    $('#form-movies').validate();
+
     // Add listener for the remove link
     $('.app-remove-movie').on('click', function(e) {
-        var targetMovie = $(this).parent().attr('movie-id');
-        console.log(targetMovie);
-    });
 
-    // Add listener for the
-    $('.app-remove-movie').on('click', function(e) {
+        // Get the id of the movie to be deleted
+        var movieId = $(this).parent().attr('movie-id');
 
+        // Get form's data and perform ajax request
+        /*$.ajax({
+            type:    'POST',
+            dataType: 'JSON',
+            data:    data,
+            success: function(data, textStatus, request) {
+                console.log(request);
+            },
+            error: function(data, textStatus, request) {
+                console.log(data);
+            }
+        });*/
         // Build the html for 
         //$('td:last').append(html);
+        // The delete was completed successfully, remove the row from the DOM
         $(this).closest('tr').remove();
     });
+
+    // Click for submitting movies form
+    $('#app-save-movie').on('click', function(e) {
+        e.preventDefault();
+
+        var form = $('#form-movies');
+
+        // Validate form
+        if (!form.valid()) {
+            return;
+        }
+
+        // Build the object with values
+        var data_form = {
+            movieName:   $('#movie-name').val(),
+            releaseYear: $('#release-year').val(),
+            rating:      $('#rating').val(),
+            action:      'insert'
+        };
+
+        // Get form's data and perform ajax request
+        $.ajax({
+            type:    'POST',
+            dataType: 'JSON',
+            data:    data_form,
+            success: function(data, textStatus, request) {
+
+                // Validate response
+                if (data.success) {
+
+                    // Update markup
+                    data_form.releaseYear = (data_form.releaseYear) ? data_form.releaseYear : '--';
+                    data_form.rating = (data_form.rating) ? data_form.rating : '--';
+
+                    var html = '<tr>' +
+                                    '<td>' + data_form.movieName + '</td>' +
+                                    '<td>' + data_form.releaseYear + '</td>' + 
+                                    '<td>' + data_form.rating + '</td>' + 
+                                    '<td>' +
+                                        '<div movie-id="' + '1' + '">' +
+                                            '<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><a href="#" class="app-remove-movie"> Remove</a>' +
+                                            '<span class="separator"> | </span>' +
+                                            '<span class="glyphicon glyphicon-edit" aria-hidden="true"></span><a href="#"> Update</a>' +
+                                        '</div>' +
+                                    '</td>' +
+                                '</tr>';
+
+                    // Append markup to last tr
+                    $('#app-movies-table tr:last').after(html);
+
+                    // Notify successful action to user
+                    alert('Insert was successful');
+
+                    // Hide modal
+                    $('#moviesModal').modal('hide');
+                } else {
+
+                    // Something failed, notify the user
+                    alert(data.cause);
+                }
+            }
+        });
+    });
+
+    // Reset modal on hide
+    $('#moviesModal ').on('hidden.bs.modal', function () {
+        $('#form-movies')[0].reset();
+        $('#form-movies').validate().resetForm();
+    });     
+
 </script>

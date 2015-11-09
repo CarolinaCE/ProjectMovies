@@ -1,72 +1,17 @@
-Symfony Standard Edition
-========================
+# My Movies App #
 
-Welcome to the Symfony Standard Edition - a fully-functional Symfony2
-application that you can use as the skeleton for your new applications.
+This is a simple application that has as purpose listing a list of Movies. Within the list there will be options to edit the Movie names and other fields such as the length, release year or rating it from 1-5. 
 
-For details on how to download and get started with Symfony, see the
-[Installation][1] chapter of the Symfony Documentation.
+Movies can also be deleted, so an action to do so is added. Adding movies is also possible with the *Add New Movie* link. 
 
-What's inside?
---------------
+Technically, Ajax calls were implemented for each one of the possible actions so the user doesn't see the page refreshing. I use a PostgreSQL database with one simple table **Movies** that has, so far, an id (autoincrement), a name, that is text type, a rating that is an integer and a year that would be a field with 4 characters. 
 
-The Symfony Standard Edition is configured with the following defaults:
+Overall, Symfony2 was used as PHP framework and the base code is the one for the sample app provided in the framework website. I used Doctrine as ORM to map the table to a Movies object. Bower was integrated to the project for the improvements on the app, meaning, the installation of different extra libraries and utilities. I added Bootstrap to style the application as could be seen here:
 
-  * An AppBundle you can use to start coding;
+![Alt text](movies_app.png)
 
-  * Twig as the only configured template engine;
+JQuery was also included as part of the added libraries to create the event listeners. This was also possible with Vanilla JavaScript but for this time I used jQuery. For adding and updating Movies, I added a modal with a simple form, including the JQuery's validation plugin, it was possible processing only valid forms:
 
-  * Doctrine ORM/DBAL;
+![Alt text](modal_films.png)
 
-  * Swiftmailer;
-
-  * Annotations enabled for everything.
-
-It comes pre-configured with the following bundles:
-
-  * **FrameworkBundle** - The core Symfony framework bundle
-
-  * [**SensioFrameworkExtraBundle**][6] - Adds several enhancements, including
-    template and routing annotation capability
-
-  * [**DoctrineBundle**][7] - Adds support for the Doctrine ORM
-
-  * [**TwigBundle**][8] - Adds support for the Twig templating engine
-
-  * [**SecurityBundle**][9] - Adds security by integrating Symfony's security
-    component
-
-  * [**SwiftmailerBundle**][10] - Adds support for Swiftmailer, a library for
-    sending emails
-
-  * [**MonologBundle**][11] - Adds support for Monolog, a logging library
-
-  * [**AsseticBundle**][12] - Adds support for Assetic, an asset processing
-    library
-
-  * **WebProfilerBundle** (in dev/test env) - Adds profiling functionality and
-    the web debug toolbar
-
-  * **SensioDistributionBundle** (in dev/test env) - Adds functionality for
-    configuring and working with Symfony distributions
-
-  * [**SensioGeneratorBundle**][13] (in dev/test env) - Adds code generation
-    capabilities
-
-  * **DebugBundle** (in dev/test env) - Adds Debug and VarDumper component
-    integration
-
-All libraries and bundles included in the Symfony Standard Edition are
-released under the MIT or BSD license.
-
-Enjoy!
-
-[1]:  https://symfony.com/doc/2.7/book/installation.html
-[6]:  https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/index.html
-[7]:  https://symfony.com/doc/2.7/book/doctrine.html
-[8]:  https://symfony.com/doc/2.7/book/templating.html
-[9]:  https://symfony.com/doc/2.7/book/security.html
-[10]: https://symfony.com/doc/2.7/cookbook/email.html
-[11]: https://symfony.com/doc/2.7/cookbook/logging/monolog.html
-[12]: https://symfony.com/doc/2.7/cookbook/assetic/asset_management.html
-[13]: https://symfony.com/doc/2.7/bundles/SensioGeneratorBundle/index.html
+**Notes:** at work, the application is written using Zend Framework. This was actually the first time I was using Symfony2 and Doctrine but had good reasons for it. Zend Framework is very hard to setup and I'm not that good for solving those type of issues, regarding the DB connection, there were several classes written years ago to manage that, they even include lots of functions to query, insert, delete, etc and being the result of years of improvement, it was not a class that I could use. ORM eases the connection to the database and provides better abstractions for operations in the data layer.

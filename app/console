@@ -23,6 +23,5 @@ if ($debug) {
 }
 
 $kernel = new AppKernel($env, $debug);
-echo 'no problem';
 $application = new Application($kernel);
 $application->run($input);
