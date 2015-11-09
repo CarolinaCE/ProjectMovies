@@ -39,16 +39,16 @@
 
                             <tbody>
                                 {% for movie in movies %}
-                                    <tr>
-                                        <td>{{movie.getMovieName()}}</td>
-                                        <td>
+                                    <tr movie-id="{{movie.getMovieId()}}">
+                                        <td class="movie_name">{{movie.getMovieName()}}</td>
+                                        <td class="release_year">
                                             {% if movie.getReleaseYear() %}
                                                {{movie.getReleaseYear()}}
                                             {% else %}
                                                 --
                                             {% endif %}
                                         </td>
-                                        <td>
+                                        <td class="rating">
                                             {% if movie.getRating() %}
                                                 {{movie.getRating()}}
                                             {% else %}
@@ -57,10 +57,10 @@
                                         </td>
 
                                     <td>
-                                        <div movie-id="{{movie.getMovieId()}}">
+                                        <div movie-id="{{movie.getMovieId()}}" movie-name="{{movie.getMovieName()}}" release-year="{{movie.getReleaseYear()}}" rating="{{movie.getRating()}}">
                                             <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><a href="#" class="app-remove-movie"> Remove</a>
                                             <span class="separator"> | </span>
-                                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span><a href="#"> Update</a>
+                                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span><a href="#" class="app-edit-movie"> Update</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -122,7 +122,7 @@
                                     <input type="number" class="form-control" min="1" max="5" step="1" id="rating" name="rating"></textarea>
                                 </div>
                             </div>
-                            <input class="hide" type="text" name="movie_id">
+                            <input class="hide" type="text" name="movie_id" id="movie-id">
                         </form>
                     </div>
                     
@@ -148,27 +148,35 @@
     $('#form-movies').validate();
 
     // Add listener for the remove link
-    $('.app-remove-movie').on('click', function(e) {
+    $('#app-movies-table').on('click', '.app-remove-movie', function(e) {
+
+        var self = this;
 
         // Get the id of the movie to be deleted
         var movieId = $(this).parent().attr('movie-id');
 
+        // Prepare data for the ajax call
+        var data_delete = {
+            movieId: movieId,
+            action:  'delete'
+        };
+
         // Get form's data and perform ajax request
-        /*$.ajax({
+        $.ajax({
             type:    'POST',
             dataType: 'JSON',
-            data:    data,
+            data:    data_delete,
             success: function(data, textStatus, request) {
-                console.log(request);
-            },
-            error: function(data, textStatus, request) {
-                console.log(data);
+                // Raw alert. This should be clearly improved to use some great plugin
+                alert(data.cause);
+
+                if (data.success) {
+
+                    // The delete was completed successfully, remove the row from the DOM
+                    $(self).closest('tr').remove();
+                }
             }
-        });*/
-        // Build the html for 
-        //$('td:last').append(html);
-        // The delete was completed successfully, remove the row from the DOM
-        $(this).closest('tr').remove();
+        });
     });
 
     // Click for submitting movies form
@@ -182,12 +190,15 @@
             return;
         }
 
+        movieId = $('#movie-id').val();
+
         // Build the object with values
         var data_form = {
             movieName:   $('#movie-name').val(),
             releaseYear: $('#release-year').val(),
             rating:      $('#rating').val(),
-            action:      'insert'
+            movieId:     movieId,
+            action:      (movieId) ? 'edit' : 'insert'
         };
 
         // Get form's data and perform ajax request
@@ -200,31 +211,25 @@
                 // Validate response
                 if (data.success) {
 
-                    // Update markup
-                    data_form.releaseYear = (data_form.releaseYear) ? data_form.releaseYear : '--';
-                    data_form.rating = (data_form.rating) ? data_form.rating : '--';
+                    // Notify the user
+                    alert(data.cause);
 
-                    var html = '<tr>' +
-                                    '<td>' + data_form.movieName + '</td>' +
-                                    '<td>' + data_form.releaseYear + '</td>' + 
-                                    '<td>' + data_form.rating + '</td>' + 
-                                    '<td>' +
-                                        '<div movie-id="' + '1' + '">' +
-                                            '<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span><a href="#" class="app-remove-movie"> Remove</a>' +
-                                            '<span class="separator"> | </span>' +
-                                            '<span class="glyphicon glyphicon-edit" aria-hidden="true"></span><a href="#"> Update</a>' +
-                                        '</div>' +
-                                    '</td>' +
-                                '</tr>';
+                    // ON update, update the fields. On insert, refresh the page
+                    if (data_form == 'edit') {
 
-                    // Append markup to last tr
-                    $('#app-movies-table tr:last').after(html);
+                        var parentTr = $('tr[movie-id="' + data_form.movieId + '"');
+                        
+                        // Set values for the list
+                        $('tr td.movie-name').val(data_form.movieName);
+                        $('tr td.release-year').val((data_form.movieName) ? data_form.releaseYear : '--');
+                        $('tr td.rating').val((data_form.rating) ? data_form.rating : '--');
 
-                    // Notify successful action to user
-                    alert('Insert was successful');
+                        // Hide modal
+                        $('#moviesModal').modal('hide');
+                    } else {
+                        location.reload();
+                    }
 
-                    // Hide modal
-                    $('#moviesModal').modal('hide');
                 } else {
 
                     // Something failed, notify the user
@@ -238,6 +243,21 @@
     $('#moviesModal ').on('hidden.bs.modal', function () {
         $('#form-movies')[0].reset();
         $('#form-movies').validate().resetForm();
-    });     
+    });
+
+    // Add listener for the update link
+    $('#app-movies-table').on('click', '.app-edit-movie', function(e) {
+
+        var parentDiv = $(this).parent('div');
+        
+        // Set values on the bootstrap modal
+        $('#movie-name').val(parentDiv.attr('movie-name'));
+        $('#release-year').val(parentDiv.attr('release-year'));
+        $('#rating').val(parentDiv.attr('rating'));
+        $('#movie-id').val(parentDiv.attr('movie-id'));
+
+        // Show the modal
+        $('#moviesModal').modal('show');
+    });
 
 </script>

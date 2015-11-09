@@ -30,7 +30,7 @@ class MoviesController extends Controller
                         $response = $this->addMovie($request);
                         break;
                     
-                    case 'update':
+                    case 'edit':
                         $response = $this->updateMovie($request);
                         break;
 
@@ -60,22 +60,6 @@ class MoviesController extends Controller
         } catch (Exception $e) {
 
         }
-    }
-
-    /**
-     * @Route("/movies/delete/{movie_id}", name="Delete Movie")
-     */
-    public function deleteAction($movie_id)
-    {
-        return new Response('<html><body>About to delete '.$movie_id.'</body></html>');
-    }
-
-    /**
-     * @Route("/movies/delete/{movie_id}", name="Update Movie")
-     */
-    public function updateAction($movie_id)
-    {
-        return new Response('<html><body>About to update '.$movie_id.'</body></html>');
     }
 
     /**
@@ -125,13 +109,29 @@ class MoviesController extends Controller
         try {
             // Get entity manager
             $em = $this->getDoctrine()->getManager();
+            $this->changeTableName($em);
+
+            // Get the movie to delete
+            $movie = $em->getRepository('AppBundle:Movie')
+                        ->findOneBy(['movieId' => $request->request->get('movieId')]);
+
+            // Remove the record, if found
+            if ($movie) {
+                $em->remove($movie);
+                $em->flush();
+            } else {
+                throw $this->createNotFoundException('The movie was not found');
+            }
+
+            $response['success'] = true;
+            $response['cause'] = 'Movie ' . $movie->getMovieName() . ' was successfully deleted!';
 
         } catch (Exception $e) {
             $response['success'] = false;
             $response['cause'] = 'Deletion failed';
         }
 
-        return new JsonResponse($response);   
+        return $response;   
     }
 
     /**
@@ -144,13 +144,34 @@ class MoviesController extends Controller
     protected function updateMovie(Request $request)
     {
         try {
+            // Get the Entity manager
+            $em = $this->getDoctrine()->getManager();
+            $this->changeTableName($em);
+
+            // Get the existing entry for the passed id
+            $movie = $em->getRepository('AppBundle:Movie')->find($request->request->get('movieId'));
+
+            if (!$movie) {
+                throw $this->createNotFoundException(
+                    'No movie found for id ' . $id
+                );
+            }
+
+            // Set properties as passed in the request
+            $movie->setMovieName($request->request->get('movieName'));
+            $movie->setReleaseYear($request->request->get('releaseYear'));
+            $movie->setRating($request->request->get('rating'));
+            $em->flush();
+
+            $response['success'] = true;
+            $response['cause'] = 'Movie ' . $movie->getMovieName() . ' was successfully updated!';
 
         } catch (Exception $e) {
             $response['success'] = false;
             $response['cause'] = 'Could not update entry';
         }
 
-        return new JsonResponse($response);  
+        return $response;  
     }
 
     /**
