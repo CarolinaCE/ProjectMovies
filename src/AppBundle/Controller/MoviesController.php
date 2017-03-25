@@ -164,7 +164,7 @@ class MoviesController extends Controller
             $em->flush();
 
             $response['success'] = true;
-            $response['cause'] = 'Movie ' . $movie->getMovieName() . ' was successfully updated!';
+            $response['cause'] = 'Movie ' . $movie->getMovieName() . ' was successfully updated! perfect';
 
         } catch (Exception $e) {
             $response['success'] = false;
